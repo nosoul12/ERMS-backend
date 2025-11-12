@@ -1,78 +1,77 @@
 import { Request, Response } from "express";
-import Report from "../models/report.model";
-import { fail, ok } from "../utils/response";
+import { Report } from "../models/report.model";
 
-export async function getAllReports(req: Request, res: Response) {
+export const getReports = async (req: Request, res: Response) => {
   try {
-    const reports = await Report.find()
-      .populate("category", "name slug")
-      .lean();
-
-    return res.json(ok("Reports fetched successfully", reports));
-  } catch (err: any) {
-    console.error("❌ Error in getAllReports:", err);
-    return res.status(500).json(fail(err.message || "Failed to fetch reports"));
+    console.log("Fetching reports from MongoDB...");
+    const reports = await Report.find().sort({ createdAt: -1 });
+    console.log(`Fetched ${reports.length} reports`);
+    res.json({ success: true, message: "Reports fetched successfully", data: reports });
+  } catch (error) {
+    console.error("Error fetching reports from MongoDB:", error);
+    res.status(500).json({ success: false, message: "Server error", error });
   }
-}
+};
 
-export async function createReport(req: Request, res: Response) {
-  try {
-    const report = await Report.create(req.body);
-    return res.status(201).json(ok("Report created successfully", report));
-  } catch (err: any) {
-    console.error("❌ Error in createReport:", err);
-    return res.status(500).json(fail(err.message || "Failed to create report"));
-  }
-}
-
-export async function updateReport(req: Request, res: Response) {
+export const getReportBySlug = async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
-    const report = await Report.findOneAndUpdate({ slug }, req.body, {
-      new: true,
-    }).populate("category", "name slug");
-
+    console.log(`Fetching report with slug: ${slug}`);
+    const report = await Report.findOne({ slug });
     if (!report) {
-      return res.status(404).json(fail("Report not found"));
+      console.warn(`Report not found for slug: ${slug}`);
+      return res.status(404).json({ success: false, message: "Report not found" });
     }
-
-    return res.json(ok("Report updated successfully", report));
-  } catch (err: any) {
-    console.error("❌ Error in updateReport:", err);
-    return res.status(500).json(fail(err.message || "Failed to update report"));
+    res.json({ success: true, message: "Report fetched successfully", data: report });
+  } catch (error) {
+    console.error("Error fetching report by slug:", error);
+    res.status(500).json({ success: false, message: "Server error", error });
   }
-}
+};
 
-export async function deleteReport(req: Request, res: Response) {
+export const createReport = async (req: Request, res: Response) => {
+  try {
+    console.log("Creating new report with data:", req.body);
+    const report = new Report(req.body);
+    await report.save();
+    console.log("Report created successfully:", report);
+    res.status(201).json({ success: true, message: "Report created successfully", data: report });
+  } catch (error) {
+    console.error("Error creating report:", error);
+    res.status(400).json({ success: false, message: "Failed to create report", error });
+  }
+};
+
+export const updateReport = async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
-    const report = await Report.findOneAndDelete({ slug });
-
-    if (!report) {
-      return res.status(404).json(fail("Report not found"));
+    console.log(`Updating report with slug: ${slug}, data:`, req.body);
+    const updated = await Report.findOneAndUpdate({ slug }, req.body, { new: true });
+    if (!updated) {
+      console.warn(`Report not found for update, slug: ${slug}`);
+      return res.status(404).json({ success: false, message: "Report not found" });
     }
-
-    return res.json(ok("Report deleted successfully"));
-  } catch (err: any) {
-    console.error("❌ Error in deleteReport:", err);
-    return res.status(500).json(fail(err.message || "Failed to delete report"));
+    console.log("Report updated successfully:", updated);
+    res.json({ success: true, message: "Report updated successfully", data: updated });
+  } catch (error) {
+    console.error("Error updating report:", error);
+    res.status(400).json({ success: false, message: "Failed to update report", error });
   }
-}
+};
 
-export async function getReportBySlug(req: Request, res: Response) {
+export const deleteReport = async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
-    const report = await Report.findOne({ slug })
-      .populate("category", "name slug")
-      .lean();
-
-    if (!report) {
-      return res.status(404).json(fail("Report not found"));
+    console.log(`Deleting report with slug: ${slug}`);
+    const deleted = await Report.findOneAndDelete({ slug });
+    if (!deleted) {
+      console.warn(`Report not found for deletion, slug: ${slug}`);
+      return res.status(404).json({ success: false, message: "Report not found" });
     }
-
-    return res.json(ok("Report fetched successfully", report));
-  } catch (err: any) {
-    console.error("❌ Error in getReportBySlug:", err);
-    return res.status(500).json(fail(err.message || "Failed to fetch report"));
+    console.log("Report deleted successfully:", deleted);
+    res.json({ success: true, message: "Report deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting report:", error);
+    res.status(400).json({ success: false, message: "Failed to delete report", error });
   }
-}
+};

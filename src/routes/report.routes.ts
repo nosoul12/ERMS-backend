@@ -2,14 +2,14 @@ import express from "express";
 import {
   createReport,
   deleteReport,
-  getAllReports,
   getReportBySlug,
+  getReports,
   updateReport,
 } from "../controllers/report.controller";
 
 const router = express.Router();
 
-router.get("/", getAllReports);
+router.get("/", getReports);
 router.get("/:slug", getReportBySlug);
 router.post("/", createReport);
 router.put("/:slug", updateReport);
