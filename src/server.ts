@@ -30,6 +30,8 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/reports", reportRoutes);
 
+
+
 app.get("/db-status", async (_req, res) => {
   const state = mongoose.connection.readyState;
   const states = ["disconnected", "connected", "connecting", "disconnecting"];

@@ -103,4 +103,13 @@ const ReportSchema = new Schema<IReport>(
   { timestamps: true }
 );
 
+ReportSchema.index({
+  title: "text",
+  subtitle: "text",
+  slug: "text",
+  publisher: "text",
+  industry: "text",
+  segment: "text",
+})
+
 export const Report = mongoose.model<IReport>("Report", ReportSchema, "reports");
