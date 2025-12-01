@@ -15,8 +15,10 @@ export const getReports = async (req: Request, res: Response) => {
     res.json({
       success: true,
       message: "Reports fetched successfully",
+      count: reports.length,
       data: reports,
-    });
+    })
+    ;
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
   }
@@ -38,8 +40,12 @@ export const getReportsByIndustry = async (req: Request, res: Response) => {
     res.json({
       success: true,
       message: "Reports fetched successfully",
+      count: reports.length,
       data: reports,
-    });
+    })
+  
+    console.log("Number of reports found:", reports.length)
+    ;
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -61,6 +67,7 @@ export const getReportBySlug = async (req: Request, res: Response) => {
     res.json({
       success: true,
       message: "Report fetched successfully",
+      count: 1,
       data: report,
     });
   } catch (error) {
@@ -137,6 +144,7 @@ export const searchForReports = async (req: Request, res: Response, next: NextFu
             return res.status(400).json({ 
                 success: false, 
                 message: 'A non-empty query parameter "q" is required.', 
+                count: 0,
                 details: error.details.map(d => d.message) 
             });
         }
@@ -149,6 +157,7 @@ export const searchForReports = async (req: Request, res: Response, next: NextFu
             return res.status(200).json({
                 success: true,
                 message: "No reports found matching the criteria.",
+                count: 0,
                 data: [],
             });
         }
@@ -156,8 +165,8 @@ export const searchForReports = async (req: Request, res: Response, next: NextFu
         res.status(200).json({
             success: true,
             message: "Search completed successfully",
+            count: results.length,
             data: results,
-            count: results.length
         });
     } catch (error) {
         next(error); 
