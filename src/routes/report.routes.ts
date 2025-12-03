@@ -22,6 +22,7 @@ const router = Router();
 router.get("/", getReports);
 router.get('/search', searchForReports);
 router.get("/industry/:industry", getReportsByIndustry); // Add this route
+//changing slug to id for better performance
 router.get("/slug/:slug", getReportBySlug);
 router.post("/", createReport);
 router.put("/:slug", updateReport);
