@@ -1,60 +1,115 @@
-import mongoose, { Document, Schema, Types } from "mongoose";
-import slugify from "slugify";
-
-export interface IReportMeta {
-  keywords?: string[];
-  seoDescription?: string;
-}
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IReport extends Document {
-  title: string;
+  reportId: string;
   slug: string;
-  category: Types.ObjectId;
-  description?: string;
-  summary?: string;
-  publishDate?: Date;
-  imageUrl?: string;
-  price?: number;
-  keyHighlights: string[];
-  tableOfContent: string[];
-  meta: IReportMeta;
-  createdAt: Date;
-  updatedAt: Date;
+  title?: string;
+  subtitle?: string;
+  publisher?: string;
+  industry?: string;
+  segment?: string;
+  timeframe?: {
+    baseYear?: number;
+    forecastStart?: number;
+    forecastEnd?: number;
+    studyPeriod?: string;
+  };
+  marketOverview?: {
+    marketSizeBaseYear?: string;
+    marketSizeForecastYear?: string;
+    cagr?: string;
+    summary?: string;
+  };
+  reportScope?: string;
+  segmentation?: Record<string, any>;
+  marketDynamics?: {
+    drivers?: string[];
+    restraints?: string[];
+    opportunities?: string[];
+    challenges?: string[];
+  };
+  regionalAnalysis?: {
+    region?: string;
+    description?: string;
+    sharePercent?: string;
+    cagr?: string;
+  }[];
+  segmentAnalysis?: {
+    segmentName?: string;
+    categories?: {
+      category?: string;
+      sharePercent?: string;
+      cagr?: string;
+      commentary?: string;
+    }[];
+  }[];
+  competitiveLandscape?: {
+    marketConcentration?: string;
+    topPlayers?: string[];
+    recentDevelopments?: {
+      company?: string;
+      event?: string;
+      date?: string;
+      source?: string;
+    }[];
+    strategicInitiatives?: string[];
+  };
+  researchMethodology?: {
+    primaryResearch?: string;
+    secondaryResearch?: string;
+    marketEstimation?: string;
+    forecastingApproach?: string;
+    validation?: string;
+    assumptions?: string;
+  };
+  keyInsights?: string[];
+  keyQuestionsAnswered?: string[];
+  toc?: {
+    section?: string;
+    subsections?: string[];
+  }[];
+  metadata?: {
+    sourceFile?: string;
+    retrievedOn?: string;
+    sourceUrl?: string;
+    lastUpdated?: string;
+    language?: string;
+  };
 }
 
 const ReportSchema = new Schema<IReport>(
   {
-    title: { type: String, required: true, trim: true },
-    slug: { type: String, unique: true, lowercase: true },
-    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-    description: { type: String, trim: true },
-    summary: { type: String, trim: true },
-    publishDate: { type: Date },
-    imageUrl: { type: String, trim: true },
-    price: { type: Number, min: 0 },
-    keyHighlights: { type: [String], default: [] },
-    tableOfContent: { type: [String], default: [] },
-    meta: {
-      keywords: { type: [String], default: [] },
-      seoDescription: { type: String, trim: true },
-    },
+    reportId: { type: String, unique: true, required: true },
+    slug: { type: String, unique: true, required: true },
+    title: String,
+    subtitle: String,
+    publisher: String,
+    industry: String,
+    segment: String,
+    timeframe: Object,
+    marketOverview: Object,
+    reportScope: String,
+    segmentation: Schema.Types.Mixed,
+    marketDynamics: Object,
+    regionalAnalysis: [Object],
+    segmentAnalysis: [Object],
+    competitiveLandscape: Object,
+    researchMethodology: Object,
+    keyInsights: [String],
+    keyQuestionsAnswered: [String],
+    toc: [Object],
+    metadata: Object,
   },
   { timestamps: true }
 );
 
-// Generate slug from title before saving
-ReportSchema.pre("save", function (next) {
-  if (this.isModified("title") || !this.slug) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
-  }
-  next();
-});
+ReportSchema.index({
+  title: "text",
+  subtitle: "text",
+  slug: "text",
+  publisher: "text",
+  industry: "text",
+  segment: "text",
+})
 
-// Keep only this index for text search
-ReportSchema.index({ title: "text", description: "text", summary: "text" });
-
-const Report =
-  (mongoose.models?.Report as mongoose.Model<IReport>) ||
-  mongoose.model<IReport>("Report", ReportSchema);
-
-export default Report;
+export const Report = mongoose.model<IReport>("Report", ReportSchema, "reports");
