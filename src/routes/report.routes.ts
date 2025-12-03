@@ -14,7 +14,7 @@ import {
   getReports,
   getReportsByIndustry,
   searchForReports,
-  updateReport,
+  updateReport
 } from "../controllers/report.controller";
 
 const router = Router();
@@ -22,7 +22,7 @@ const router = Router();
 router.get("/", getReports);
 router.get('/search', searchForReports);
 router.get("/industry/:industry", getReportsByIndustry); // Add this route
-router.get("/:slug", getReportBySlug);
+router.get("/slug/:slug", getReportBySlug);
 router.post("/", createReport);
 router.put("/:slug", updateReport);
 router.delete("/:slug", deleteReport);
