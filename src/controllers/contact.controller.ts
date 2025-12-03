@@ -2,30 +2,38 @@ import { Request, Response } from "express";
 import Contact from "../models/contact.model";
 
 /**
- * @desc Create a new contact message
+ * @desc Create a new contact
  * @route POST /api/contacts
  */
 export async function createContact(req: Request, res: Response) {
   try {
-    const { name, email, subject, message } = req.body;
+    const {
+      fullName,
+      email,
+      countryCode,
+      phone,
+      company,
+      industry,
+      subject,
+      message
+    } = req.body;
 
-    // ✅ Validate all fields
-    if (
-      !name?.trim() ||
-      !email?.trim() ||
-      !subject?.trim() ||
-      !message?.trim()
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+    // Validate required fields
+    if (!fullName || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: "fullName, email, and message are required",
+      });
     }
 
-    // ✅ Create a new contact entry
     const contact = await Contact.create({
-      name: name.trim(),
+      fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
-      subject: subject.trim(),
+      countryCode,
+      phone,
+      company,
+      industry,
+      subject,
       message: message.trim(),
     });
 
@@ -34,26 +42,33 @@ export async function createContact(req: Request, res: Response) {
       message: "Contact created successfully",
       data: contact,
     });
-  } catch (err) {
-    console.error("❌ Error creating contact:", err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+  } catch (error) {
+    console.error("❌ Contact creation error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 }
 
 /**
- * @desc Get all contact messages
+ * @desc Get all contacts
  * @route GET /api/contacts
  */
-export async function getAllContacts(_req: Request, res: Response) {
+export async function getContacts(_req: Request, res: Response) {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
-    return res.json({ success: true, data: contacts });
-  } catch (err) {
-    console.error("❌ Error fetching contacts:", err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch contacts" });
+
+    return res.status(200).json({
+      success: true,
+      count: contacts.length,
+      data: contacts,
+    });
+  } catch (error) {
+    console.error("❌ Fetch contacts error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch contacts",
+    });
   }
 }
