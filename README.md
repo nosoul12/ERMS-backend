@@ -40,7 +40,6 @@ cp .env.example .env
 
 ### Environment Variables
 ```env
-MONGODB_URI=mongodb+srv://Tanishq603:DhQYOEzwHi7F6oZd@cluster0.qpebrnr.mongodb.net/ERMS_DB?retryWrites=true&w=majority
 MONGODB_DB_NAME=ERMS_DB
 PORT=4000
 CORS_ORIGIN=*

@@ -3,113 +3,201 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IReport extends Document {
   reportId: string;
   slug: string;
-  title?: string;
+  title: string;
   subtitle?: string;
-  publisher?: string;
-  industry?: string;
-  segment?: string;
-  timeframe?: {
-    baseYear?: number;
-    forecastStart?: number;
-    forecastEnd?: number;
-    studyPeriod?: string;
+  publisher: string;
+  industry: string;
+  segment: string;
+  timeframe: {
+    baseYear: number;
+    forecastStart: number;
+    forecastEnd: number;
+    studyPeriod: string;
   };
-  marketOverview?: {
-    marketSizeBaseYear?: string;
-    marketSizeForecastYear?: string;
-    cagr?: string;
-    summary?: string;
+  marketOverview: {
+    marketSizeBaseYear: string;
+    marketSizeForecastYear: string;
+    cagr: string;
+    summary: string;
   };
-  reportScope?: string;
-  segmentation?: Record<string, any>;
-  marketDynamics?: {
-    drivers?: string[];
-    restraints?: string[];
-    opportunities?: string[];
-    challenges?: string[];
+  reportScope: string;
+  segmentation: {
+    byOffering: string[];
+    byDeployment: string[];
+    byEndUserIndustry: string[];
+    byRegion: string[];
   };
-  regionalAnalysis?: {
-    region?: string;
-    description?: string;
-    sharePercent?: string;
-    cagr?: string;
+  marketDynamics: {
+    drivers: string[];
+    restraints: string[];
+    opportunities: string[];
+    challenges: string[];
+  };
+  regionalAnalysis: {
+    region: string;
+    description: string;
+    sharePercent: string;
+    cagr: string;
   }[];
-  segmentAnalysis?: {
-    segmentName?: string;
-    categories?: {
-      category?: string;
-      sharePercent?: string;
-      cagr?: string;
-      commentary?: string;
+  competitiveLandscape: {
+    marketConcentration: string;
+    topPlayers: string[];
+    recentDevelopments: {
+      company: string;
+      event: string;
+      date: string;
     }[];
+    strategicInitiatives: string[];
+  };
+  researchMethodology: {
+    primaryResearch: string;
+    secondaryResearch: string;
+    marketEstimation: string;
+    forecastingApproach: string;
+    validation: string;
+    assumptions: string;
+  };
+  metadata: {
+    sourceFile: string;
+    retrievedOn: string;
+    language: string;
+  };
+  price: number;
+  imageUrl?: string;
+  pages: number;
+  format: string;
+  forecastData: {
+    year: string;
+    value: number;
   }[];
-  competitiveLandscape?: {
-    marketConcentration?: string;
-    topPlayers?: string[];
-    recentDevelopments?: {
-      company?: string;
-      event?: string;
-      date?: string;
-      source?: string;
-    }[];
-    strategicInitiatives?: string[];
-  };
-  researchMethodology?: {
-    primaryResearch?: string;
-    secondaryResearch?: string;
-    marketEstimation?: string;
-    forecastingApproach?: string;
-    validation?: string;
-    assumptions?: string;
-  };
-  keyInsights?: string[];
-  keyQuestionsAnswered?: string[];
-  toc?: {
-    section?: string;
-    subsections?: string[];
+  revenueByRegionData: {
+    region: string;
+    value: number;
   }[];
-  metadata?: {
-    sourceFile?: string;
-    retrievedOn?: string;
-    sourceUrl?: string;
-    lastUpdated?: string;
-    language?: string;
-  };
+  segmentShareData: {
+    name: string;
+    value: number;
+    color?: string;
+  }[];
+  sentimentData: {
+    label: string;
+    value: number;
+  }[];
 }
 
 const ReportSchema = new Schema<IReport>(
   {
-    reportId: { type: String, unique: true, required: true },
-    slug: { type: String, unique: true, required: true },
-    title: String,
-    subtitle: String,
-    publisher: String,
-    industry: String,
-    segment: String,
-    timeframe: Object,
-    marketOverview: Object,
+    reportId: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
+    subtitle: { type: String },
+
+    publisher: { type: String },
+    industry: { type: String },
+    segment: { type: String },
+
+    timeframe: {
+      baseYear: Number,
+      forecastStart: Number,
+      forecastEnd: Number,
+      studyPeriod: String,
+    },
+
+    marketOverview: {
+      marketSizeBaseYear: String,
+      marketSizeForecastYear: String,
+      cagr: String,
+      summary: String,
+    },
+
     reportScope: String,
-    segmentation: Schema.Types.Mixed,
-    marketDynamics: Object,
-    regionalAnalysis: [Object],
-    segmentAnalysis: [Object],
-    competitiveLandscape: Object,
-    researchMethodology: Object,
-    keyInsights: [String],
-    keyQuestionsAnswered: [String],
-    toc: [Object],
-    metadata: Object,
+
+    segmentation: {
+      byOffering: [String],
+      byDeployment: [String],
+      byEndUserIndustry: [String],
+      byRegion: [String],
+    },
+
+    marketDynamics: {
+      drivers: [String],
+      restraints: [String],
+      opportunities: [String],
+      challenges: [String],
+    },
+
+    regionalAnalysis: [
+      {
+        region: String,
+        description: String,
+        sharePercent: String,
+        cagr: String,
+      },
+    ],
+
+    competitiveLandscape: {
+      marketConcentration: String,
+      topPlayers: [String],
+      recentDevelopments: [
+        {
+          company: String,
+          event: String,
+          date: String,
+        },
+      ],
+      strategicInitiatives: [String],
+    },
+
+    researchMethodology: {
+      primaryResearch: String,
+      secondaryResearch: String,
+      marketEstimation: String,
+      forecastingApproach: String,
+      validation: String,
+      assumptions: String,
+    },
+
+    metadata: {
+      sourceFile: String,
+      retrievedOn: String,
+      language: String,
+    },
+
+    price: Number,
+    imageUrl: String,
+    pages: Number,
+    format: String,
+
+    forecastData: [
+      {
+        year: String,
+        value: Number,
+      },
+    ],
+
+    revenueByRegionData: [
+      {
+        region: String,
+        value: Number,
+      },
+    ],
+
+    segmentShareData: [
+      {
+        name: String,
+        value: Number,
+        color: String,
+      },
+    ],
+
+    sentimentData: [
+      {
+        label: String,
+        value: Number,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-ReportSchema.index({
-  title: "text",
-  subtitle: "text",
-  slug: "text",
-  publisher: "text",
-  industry: "text",
-  segment: "text",
-})
-
-export const Report = mongoose.model<IReport>("Report", ReportSchema, "reports");
+export default mongoose.model<IReport>("Report", ReportSchema);
