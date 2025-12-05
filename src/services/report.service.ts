@@ -1,5 +1,5 @@
 // src/services/report.service.ts
-import { Report } from "../models/report.model";
+import Report from "../models/report.model";
 
 export const fetchReports = async () => {
   return await Report.find().sort({ createdAt: -1 });

@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { connectDB, disconnectDB } from "./db/mongoose";
 import categoryRoutes from "./routes/category.routes";
 import contactRoutes from "./routes/contact.routes";
+import insightRoutes from "./routes/insight.routes";
 import reportRoutes from "./routes/report.routes";
 
 dotenv.config();
@@ -29,6 +30,8 @@ app.get("/", (_req, res) => res.send("Backend is running"));
 app.use("/api/contacts", contactRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/insights", insightRoutes);
+
 
 
 
