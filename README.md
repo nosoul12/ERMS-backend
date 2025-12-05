@@ -40,7 +40,12 @@ cp .env.example .env
 
 ### Environment Variables
 ```env
-
+MONGODB_DB_NAME=ERMS_DB
+PORT=4000
+CORS_ORIGIN=*
+MONGODB_MAX_RETRIES=5
+MONGODB_MAX_POOL_SIZE=10
+MONGODB_MIN_POOL_SIZE=0
 ```
 
 ### Development

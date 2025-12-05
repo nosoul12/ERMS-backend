@@ -1,5 +1,7 @@
+// src/controllers/contact.controller.ts
+
 import { Request, Response } from "express";
-import Contact from "../models/contact.model";
+import { contactService } from "../services/contact.service";
 
 /**
  * @desc Create a new contact
@@ -7,18 +9,8 @@ import Contact from "../models/contact.model";
  */
 export async function createContact(req: Request, res: Response) {
   try {
-    const {
-      fullName,
-      email,
-      countryCode,
-      phone,
-      company,
-      industry,
-      subject,
-      message
-    } = req.body;
+    const { fullName, email, message } = req.body;
 
-    // Validate required fields
     if (!fullName || !email || !message) {
       return res.status(400).json({
         success: false,
@@ -26,16 +18,7 @@ export async function createContact(req: Request, res: Response) {
       });
     }
 
-    const contact = await Contact.create({
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      countryCode,
-      phone,
-      company,
-      industry,
-      subject,
-      message: message.trim(),
-    });
+    const contact = await contactService.createContact(req.body);
 
     return res.status(201).json({
       success: true,
@@ -43,7 +26,7 @@ export async function createContact(req: Request, res: Response) {
       data: contact,
     });
   } catch (error) {
-    console.error("❌ Contact creation error:", error);
+    console.error("❌ createContact error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -55,9 +38,9 @@ export async function createContact(req: Request, res: Response) {
  * @desc Get all contacts
  * @route GET /api/contacts
  */
-export async function getContacts(_req: Request, res: Response) {
+export async function getContacts(req: Request, res: Response) {
   try {
-    const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
+    const contacts = await contactService.getContacts();
 
     return res.status(200).json({
       success: true,
@@ -65,10 +48,66 @@ export async function getContacts(_req: Request, res: Response) {
       data: contacts,
     });
   } catch (error) {
-    console.error("❌ Fetch contacts error:", error);
+    console.error("❌ getContacts error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch contacts",
+    });
+  }
+}
+
+/**
+ * @desc Get single contact by ID
+ * @route GET /api/contacts/:id
+ */
+export async function getContactById(req: Request, res: Response) {
+  try {
+    const contact = await contactService.getContactById(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: contact,
+    });
+  } catch (error) {
+    console.error("❌ getContactById error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+/**
+ * @desc Delete a contact by ID
+ * @route DELETE /api/contacts/:id
+ */
+export async function deleteContact(req: Request, res: Response) {
+  try {
+    const contact = await contactService.deleteContact(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: "Contact not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact deleted successfully",
+    });
+  } catch (error) {
+    console.error("❌ deleteContact error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 }
